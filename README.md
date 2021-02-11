@@ -3,6 +3,8 @@ The code that runs the Atari 8-bit Twitter bot at https://twitter.com/Atari8BitB
 
 I'm sharing this so people can use this as a stepping stonw to making their own, different bots.
 
+The main twitter posting code is based on what I learned from "The Reply to Mentions Bot" at https://realpython.com/twitter-bot-python-tweepy/#the-config-module
+
 Dependencies. So many dependencies:
 - Tweepy. Specifically the fork that allows video uploads. https://github.com/tweepy/tweepy/pull/1414 They plan on folding that feature into the main program but as of this writing, haven't.
 - atari800 emulator: https://github.com/atari800/atari800
