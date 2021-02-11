@@ -1,0 +1,17 @@
+#This goes in /etc/systemd/system/AtariBot.service to make the bot run at boot
+
+[Unit]
+Description=Atari Bot
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 -u /home/atari8/bot/AtariBot.py
+WorkingDirectory=/home/atari8/bot/
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+RestartSec=20
+User=atari8
+
+[Install]
+WantedBy=multi-user.target
