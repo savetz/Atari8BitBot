@@ -12,4 +12,4 @@ Dependencies. So many dependencies:
 - franny, an ATR disk image editor: http://atari8.sourceforge.net/franny.html and https://sourceforge.net/projects/atari8/files/franny/
 - ffmpeg, for processing video files: https://ffmpeg.org
 - and in the assets/ directory: ROM files: ATARIXL.ROM (the Atari XL operating system), logo.ROM (Atari Logo), PILOT.ROM (Atari PILOT), ASM.rom (Atari Assembler Editor), action.ROM (OSS Action!). These are not provided in this repository due to copyright.
-- also in the assets/ directory: ATR disk images: action.atr (Action! Tooklit), dos2.atr (Atari DOS 2.0S), PILOTII.atr (Atari Super PILOT), TBXL.atr (Turbo BASIC XL). These are not provided in this repository due to copyright.
+- also in the assets/ directory: ATR disk images: action.atr (Action! Tooklit), PILOTII.atr (Atari Super PILOT), TBXL.atr (Turbo BASIC XL). These are not provided in this repository due to copyright.
