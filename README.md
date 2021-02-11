@@ -3,6 +3,8 @@ The code that runs the Atari 8-bit Twitter bot at https://twitter.com/Atari8BitB
 
 I'm sharing this so people can use this as a stepping stonw to making their own, different bots.
 
+Documentation for using the bot is at https://atari8bitbot.com
+
 The main twitter posting code is based on what I learned from "The Reply to Mentions Bot" at https://realpython.com/twitter-bot-python-tweepy/#the-config-module
 
 Dependencies. So many dependencies:
