@@ -8,6 +8,7 @@ Documentation for using the bot is at https://atari8bitbot.com
 The main twitter posting code is based on what I learned from "The Reply to Mentions Bot" at https://realpython.com/twitter-bot-python-tweepy/#the-config-module
 
 Dependencies. So many dependencies:
+- A Twitter account, and API keys for it https://developer.twitter.com/en/products/twitter-api
 - Tweepy. Specifically the fork that allows video uploads. https://github.com/tweepy/tweepy/pull/1414 They plan on folding that feature into the main program but as of this writing, haven't.
 - atari800 emulator: https://github.com/atari800/atari800
 - TBXL-Parser, for parsing Atari BASIC and TBXL programs: https://github.com/dmsc/tbxl-parser
