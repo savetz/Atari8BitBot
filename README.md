@@ -1,7 +1,7 @@
 # Atari8BitBot
 The code that runs the Atari 8-bit Twitter bot at https://twitter.com/Atari8BitBot
 
-I'm sharing this so people can use this as a stepping stonw to making their own, different bots.
+I'm sharing this so people can use this as a stepping stone to making their own, different bots.
 
 Documentation for using the bot is at https://atari8bitbot.com
 
