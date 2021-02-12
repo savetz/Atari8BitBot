@@ -15,3 +15,4 @@ Dependencies. So many dependencies:
 - ffmpeg, for processing video files: https://ffmpeg.org
 - and in the assets/ directory: ROM files: ATARIXL.ROM (the Atari XL operating system), logo.ROM (Atari Logo), PILOT.ROM (Atari PILOT), ASM.rom (Atari Assembler Editor), action.ROM (OSS Action!). These are not provided in this repository due to copyright.
 - also in the assets/ directory: ATR disk images: action.atr (Action! Tooklit), PILOTII.atr (Atari Super PILOT), TBXL.atr (Turbo BASIC XL). These are not provided in this repository due to copyright.
+- An X Virtual Frame Buffer running on display 99 (/usr/bin/Xvfb :99 -ac -screen 0 1024x768x24)
