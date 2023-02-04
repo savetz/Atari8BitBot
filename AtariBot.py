@@ -245,7 +245,7 @@ def check_mentions(api, since_id):
         emuPid.kill()
 
         logger.info("Converting video")
-        result = os.system('ffmpeg -loglevel warning -y -i working/OUTPUT_BIG.mp4 -vcodec libx264 -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" -pix_fmt yuv420p -strict experimental -r 30 -t 2:20 -acodec aac -vb 1024k -minrate 1024k -maxrate 1024k -bufsize 1024k -ar 44100 -ac 2 working/OUTPUT_SMALL.mp4')
+        result = os.system('ffmpeg -loglevel warning -y -i working/OUTPUT_BIG.mp4 -c:v libx264 -sws_flags accurate_rnd -pix_fmt yuv420p -r 30 -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2,scale=1440:1080" -b:v 5M -t 2:20 -acodec aac -ar 44100 -ac 2 working/OUTPUT_SMALL.mp4')
         #per https://gist.github.com/nikhan/26ddd9c4e99bbf209dd7#gistcomment-3232972
 
         logger.info("Uploading video")
