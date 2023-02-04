@@ -1,4 +1,4 @@
-FROM python:stretch AS builder
+FROM python:bullseye AS builder
 
 RUN apt update
 RUN apt install -yq peg gawk
@@ -11,7 +11,7 @@ RUN ls -la /root/franny-1.1.3/
 RUN wget -q --no-check-certificate https://github.com/dmsc/tbxl-parser/archive/refs/tags/v10.tar.gz -O tbxl-parser-10.tar.gz && tar -zxf tbxl-parser-10.tar.gz && cd tbxl-parser-10 && make CROSS= EXT= CFLAGS='-Wall -O2 -flto -DNDEBUG'
 
 
-FROM  python:stretch AS base
+FROM  python:bullseye AS base
 
 ENV DEBIAN_FRONTEND=noninteractive
 COPY nonfree.repo /etc/apt/sources.list.d/nonfree.list
@@ -19,11 +19,13 @@ COPY nonfree.repo /etc/apt/sources.list.d/nonfree.list
 
 RUN useradd atari -d /home/atari8
 RUN apt update
-RUN apt install -yq atari800 ffmpeg xdotool xvfb libc6
+RUN apt install -yq ffmpeg xdotool xvfb libc6 libsdl1.2debian
+RUN wget -q --no-check-certificate https://github.com/atari800/atari800/releases/download/ATARI800_5_0_0/atari800_5.0.0_amd64.deb && dpkg -i atari800_5.0.0_amd64.deb
 RUN mkdir -p /home/atari8/bot && chown atari /home/atari8/bot
+RUN mkdir -p /usr/local/franny/bin/
 
 COPY --chown=atari . /home/atari8/bot
-COPY --from=builder --chmod=755 /root/franny-1.1.3/franny /usr/local/bin/
+COPY --from=builder --chmod=755 /root/franny-1.1.3/franny /usr/local/franny/bin/
 COPY --from=builder --chmod=755 /root/tbxl-parser-10/build/basicParser /usr/local/bin/
 WORKDIR /home/atari8/bot
 RUN pip3 install -r requirements.txt
