@@ -268,7 +268,7 @@ def check_mentions(api, since_id):
 def main():
     os.chdir('/home/atari8/bot/')
 
-    api = botConfig.create_api()
+    api = botConfig.create_api_mastodon()
 
     now = datetime.now()
     logger.info("START TIME:")
