@@ -32,7 +32,6 @@ RUN pip3 install -r requirements.txt
 
 USER atari
 ENV DISPLAY=:99
-ENV SDL_AUDIODRIVER=dummy
 ENV PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/usr/local/sbin
 
 RUN mkdir -p working
