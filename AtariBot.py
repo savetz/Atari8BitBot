@@ -1,6 +1,6 @@
 #Atari8BitBot by @KaySavetz. 2020-2021.
 
-import tweepy
+import MastodonApi
 import logging
 from botConfig import create_api
 import time
@@ -17,13 +17,13 @@ logger = logging.getLogger()
 def check_mentions(api, since_id):
     logger.info("Retrieving mentions")
     new_since_id = since_id
-    for tweet in tweepy.Cursor(api.mentions_timeline, since_id=since_id, tweet_mode='extended').items():
-        new_since_id = max(tweet.id, new_since_id)
+    for message in MastodonApi.get_replies(since_id):
+        new_since_id = max(message.id, new_since_id)
 
-        logger.info(f"Tweet from {tweet.user.name}")
+        logger.info(f"Toot from {message.user.name}")
 
         #remove all @ mentions, leaving just the BASIC code
-        basiccode = re.sub('^(@.+?\s)+','',tweet.full_text)
+        basiccode = re.sub('^(@.+?\s)+','',tweet.full_text, re.ASCII)
 
         basiccode = unidecode(basiccode)
 
@@ -31,12 +31,22 @@ def check_mentions(api, since_id):
         basiccode = basiccode.replace("&lt;", "<")
         basiccode = basiccode.replace("&gt;", ">")
         basiccode = basiccode.replace("&amp;", "&")
+        #replace typogrphical quotes
+        lead_double = u"\u201c"
+        follow_double = u"\u201d"
+        lead_single = u"\u2018"
+        follow_single = u"\u2019"
+        basiccode = basiccode.replace(lead_double, '"')
+        basiccode = basiccode.replace(follow_double, '"')
+        basiccode = basiccode.replace(lead_single, "'")
+        basiccode = basiccode.replace(follow_single, "'")
+
 
 #determine language:
         #look for start time command
         exp = "{\w*?B(\d\d?)\w*(?:}|\s)" # {B\d\d  B= Begin
         result = re.search(exp,basiccode)
-        if result:  
+        if result:
             starttime = int(result.group(1))
             logger.info(f" Requests start at {starttime} seconds")
         else:
@@ -56,7 +66,7 @@ def check_mentions(api, since_id):
         language = 0 # default to BASIC
 
         exp = "{\w*?P\w*(?:}|\s)" #{P
-        if re.search(exp,basiccode): 
+        if re.search(exp,basiccode):
             language=1 #it's PILOT
             logger.info("it's PILOT")
 
@@ -85,7 +95,7 @@ def check_mentions(api, since_id):
             logger.info("it's SuperPILOT")
 
         exp = "{\w*?A\w*(?:}|\s)" #{A
-        if re.search(exp,basiccode): 
+        if re.search(exp,basiccode):
             language=2 #it's Assembly
             logger.info("it's ASM")
 
@@ -238,7 +248,7 @@ def check_mentions(api, since_id):
         result = os.system('ffmpeg -loglevel warning -y -i working/OUTPUT_BIG.mp4 -vcodec libx264 -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" -pix_fmt yuv420p -strict experimental -r 30 -t 2:20 -acodec aac -vb 1024k -minrate 1024k -maxrate 1024k -bufsize 1024k -ar 44100 -ac 2 working/OUTPUT_SMALL.mp4')
         #per https://gist.github.com/nikhan/26ddd9c4e99bbf209dd7#gistcomment-3232972
 
-        logger.info("Uploading video")  
+        logger.info("Uploading video")
 
         media = api.media_upload("working/OUTPUT_SMALL.mp4")
 
@@ -262,7 +272,7 @@ def main():
 
     now = datetime.now()
     logger.info("START TIME:")
-    logger.info(now.strftime("%Y %m %d %H:%M:%S")) 
+    logger.info(now.strftime("%Y %m %d %H:%M:%S"))
 
     try:
         sinceFile = open('sinceFile.txt','r')
@@ -273,10 +283,10 @@ def main():
         logger.info("created new sinceFile")
         since_id = 1
 
-    sinceFile.close()       
+    sinceFile.close()
     since_id = int(since_id)
     logger.info(f"Starting since_id {since_id}")
-    
+
     os.environ["DISPLAY"] = ":99"
 
     while True:
@@ -286,7 +296,7 @@ def main():
         if new_since_id != since_id:
             since_id = new_since_id
             logger.info(f"Since_id now {since_id}")
-        
+
             sinceFile = open('sinceFile.txt','w')
             sinceFile.write(str(since_id))
             sinceFile.close()
@@ -298,4 +308,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
+

@@ -1,0 +1,4 @@
+tweepy>=4.0
+unidecode
+Mastodon.py>=1.7.0
+bs4
