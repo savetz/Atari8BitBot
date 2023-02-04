@@ -1,6 +1,7 @@
 from mastodon import Mastodon
 import logging
 import re
+import os
 
 from types import SimpleNamespace
 from bs4 import BeautifulSoup
@@ -8,22 +9,23 @@ from bs4 import BeautifulSoup
 class MastodonApi:
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger()
+    api = None
 
     def get_api(Self, client_id, client_secret, access_token, access_token_secret):
-        api=Mastodon(client_id, client_secret, access_token, "https://mastodon.cloud/" )
-        return api
+        Self.api=Mastodon(client_id, client_secret, access_token, os.getenv('MASTODON_SERVER') )
+        return Self.api
 
-    def media_upload(Self, api,filename):
+    def media_upload(Self,filename):
         media = SimpleNamespace()
-        mastodon_media = api.media_post(filename,synchronous=True)
+        mastodon_media = Self.api.media_post(filename,synchronous=True)
         media.media_id=mastodon_media.id
         return media
 
-    def update_status(Self, api,text,id, media):
-        status= api.status_post(text,in_reply_to_id=id, media_ids=[media.media_id])
+    def update_status(Self,text, media ,id):
+        status= Self.api.status_post(text,in_reply_to_id=id, media_ids=[media.media_id])
         return status
 
-    def reply(Self,api, toot, text):
+    def reply(Self, toot, text):
 
         msg=" "
         for line in text.split("\n"):
@@ -33,14 +35,14 @@ class MastodonApi:
         Self.logger.info(f"MSG: {msg}")
         status = {}
         try:
-            status = api.status_post(msg,in_reply_to_id=toot.id)
+            status = Self.api.status_post(msg,in_reply_to_id=toot.id)
         except:
             Self.logger.error(f"Unable to post message: {status}")
 
-    def get_replies(Self, api, since_id):
+    def get_replies(Self, since_id):
         replies={}
         #result=api.search("#atari8bitbot", result_type="statuses",exclude_unreviewed=False, min_id=since_id)
-        result=api.timeline_hashtag("atari8bitbot", since_id=since_id)
+        result=Self.api.timeline_hashtag("atari8bitbot", since_id=since_id)
         Self.logger.debug(f"result: {result}")
         for toot in result:
             #parse the message to extract entities

@@ -2,7 +2,7 @@
 
 import MastodonApi
 import logging
-from botConfig import create_api
+import botConfig
 import time
 from shutil import copyfile
 import os,sys
@@ -17,13 +17,13 @@ logger = logging.getLogger()
 def check_mentions(api, since_id):
     logger.info("Retrieving mentions")
     new_since_id = since_id
-    for message in MastodonApi.get_replies(since_id):
+    for message in api.get_replies(since_id):
         new_since_id = max(message.id, new_since_id)
 
         logger.info(f"Toot from {message.user.name}")
 
         #remove all @ mentions, leaving just the BASIC code
-        basiccode = re.sub('^(@.+?\s)+','',tweet.full_text, re.ASCII)
+        basiccode = re.sub('^(@.+?\s)+','',message.full_text, re.ASCII)
 
         basiccode = unidecode(basiccode)
 
@@ -259,7 +259,7 @@ def check_mentions(api, since_id):
 
         logger.info(f"Posting message to @{message.user.name}")
         toottext = f"@{message.user.name} "
-        post_result = api.update_status(api,toottext, media, in_reply_to_status_id=message.id)
+        post_result = api.update_status(toottext, media, message.id)
 
         logger.info("Done!")
 
@@ -268,7 +268,7 @@ def check_mentions(api, since_id):
 def main():
     os.chdir('/home/atari8/bot/')
 
-    api = create_api()
+    api = botConfig.create_api()
 
     now = datetime.now()
     logger.info("START TIME:")
@@ -290,7 +290,7 @@ def main():
     os.environ["DISPLAY"] = ":99"
 
     while True:
-        didatweet=0
+        didamessage=0
         new_since_id = check_mentions(api, since_id)
 
         if new_since_id != since_id:
@@ -300,9 +300,9 @@ def main():
             sinceFile = open('sinceFile.txt','w')
             sinceFile.write(str(since_id))
             sinceFile.close()
-            didatweet=1
+            didamessage=1
 
-        if didatweet==0:
+        if didamessage==0:
             logger.info("Waiting...")
             time.sleep(120)
 
