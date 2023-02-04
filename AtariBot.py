@@ -257,9 +257,9 @@ def check_mentions(api, since_id):
         time.sleep(5)
 #TODO replace with get_media_upload_status per https://github.com/tweepy/tweepy/pull/1414
 
-        logger.info(f"Posting tweet to @{tweet.user.screen_name}")
-        tweettext = f"@{tweet.user.screen_name} "
-        post_result = api.update_status(auto_populate_reply_metadata=False, status=tweettext, media_ids=[media.media_id], in_reply_to_status_id=tweet.id)
+        logger.info(f"Posting message to @{message.user.name}")
+        toottext = f"@{message.user.name} "
+        post_result = api.update_status(api,toottext, media, in_reply_to_status_id=message.id)
 
         logger.info("Done!")
 

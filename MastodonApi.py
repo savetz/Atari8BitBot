@@ -39,8 +39,8 @@ class MastodonApi:
 
     def get_replies(Self, api, since_id):
         replies={}
-        #result=api.search("#zxspectrumbot", result_type="statuses",exclude_unreviewed=False, min_id=since_id)
-        result=api.timeline_hashtag("zxspectrumbot", since_id=since_id)
+        #result=api.search("#atari8bitbot", result_type="statuses",exclude_unreviewed=False, min_id=since_id)
+        result=api.timeline_hashtag("atari8bitbot", since_id=since_id)
         Self.logger.debug(f"result: {result}")
         for toot in result:
             #parse the message to extract entities
