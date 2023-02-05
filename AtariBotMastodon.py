@@ -205,7 +205,7 @@ def check_mentions(api, since_id):
             cmd = '/usr/bin/atari800 -config atari800.cfg working/disk.atr'.split()
 
 
-        emuPid = subprocess.Popen(cmd, env={"DISPLAY": ":99","SDL_AUDIODRIVER": "dummy"})
+        emuPid = subprocess.Popen(cmd, env={"DISPLAY": ":98","SDL_AUDIODRIVER": "dummy"})
         logger.info(f"   Process ID {emuPid.pid}")
 
         if language==3: #Logo
@@ -239,7 +239,7 @@ def check_mentions(api, since_id):
         time.sleep(starttime)
 
         logger.info("Recording with ffmpeg")
-        result = os.system(f'/usr/bin/ffmpeg -y -hide_banner -loglevel warning -f x11grab -r 30 -video_size 672x440 -i :99 -q:v 0 -pix_fmt yuv422p -f alsa -ac 2 -i pulse -acodec aac -strict experimental  -t {recordtime} working/OUTPUT_BIG.mp4')
+        result = os.system(f'/usr/bin/ffmpeg -y -hide_banner -loglevel warning -f x11grab -r 30 -video_size 672x440 -i :98 -q:v 0 -pix_fmt yuv422p  -t {recordtime} working/OUTPUT_BIG.mp4')
 
         logger.info("Stopping emulator")
         emuPid.kill()
@@ -287,7 +287,7 @@ def main():
     since_id = int(since_id)
     logger.info(f"Starting since_id {since_id}")
 
-    os.environ["DISPLAY"] = ":99"
+    os.environ["DISPLAY"] = ":98"
 
     while True:
         didamessage=0
