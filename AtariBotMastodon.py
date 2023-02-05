@@ -263,7 +263,7 @@ def main():
         if os.path.exists("working/disk.atr"):
             os.remove("working/disk.atr")
         if os.path.exists("working/atari800_output.avi"):
-            os.remove("working/movie.fmf")
+            os.remove("working/atari800_output.avi")
         if os.path.exists("working/OUTPUT_SMALL.mp4"):
             os.remove("working/OUTPUT_SMALL.mp4")
         if os.path.exists("working/OUTPUT_BIG.mp4"):
