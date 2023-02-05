@@ -51,7 +51,7 @@ def check_mentions(api, since_id):
             starttime = int(result.group(1))
             logger.info(f" Requests start at {starttime} seconds")
         else:
-            starttime = 3
+            starttime = 2
 
         #look for length of time to record command
         exp = "{\w*?S(\d\d?)\w*(?:}|\s)" # {S\d\d  S= Seconds to record
@@ -143,11 +143,11 @@ def check_mentions(api, since_id):
 
         if language==0: #BASIC
             #tokenize BASIC program
-            result = os.system('basicParser -b -f -k -o working/AUTORUN.BAS working/incomingBASIC.txt')
-            if result==256:
+            result = os.popen('basicParser -b -f -k -o working/AUTORUN.BAS working/incomingBASIC.txt')
+            if "error:" in result:
                 logger.info("!!! PARSER FAILED, SKIPPING")
+                api.reply(message, result[:200])
                 continue
-
 
         if language==0: #BASIC
             logger.info("Making disk image, moving tokenized BASIC")
