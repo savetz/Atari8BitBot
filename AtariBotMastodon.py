@@ -51,7 +51,7 @@ def check_mentions(api, since_id):
             starttime = int(result.group(1))
             logger.info(f" Requests start at {starttime} seconds")
         else:
-            starttime = 3
+            starttime = 2
 
         #look for length of time to record command
         exp = "{\w*?S(\d\d?)\w*(?:}|\s)" # {S\d\d  S= Seconds to record
@@ -143,11 +143,11 @@ def check_mentions(api, since_id):
 
         if language==0: #BASIC
             #tokenize BASIC program
-            result = os.system('basicParser -b -f -k -o working/AUTORUN.BAS working/incomingBASIC.txt')
-            if result==256:
+            result = os.popen('basicParser -b -f -k -o working/AUTORUN.BAS working/incomingBASIC.txt 2>&1').read()
+            if "error:" in result:
                 logger.info("!!! PARSER FAILED, SKIPPING")
+                api.reply(message, result[:200])
                 continue
-
 
         if language==0: #BASIC
             logger.info("Making disk image, moving tokenized BASIC")
@@ -217,7 +217,7 @@ def check_mentions(api, since_id):
         os.system(cmd)
 
         logger.info("Converting video")
-        result = os.system('ffmpeg -loglevel warning -y -i working/atari800_output.avi -vcodec libx264 -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" -pix_fmt yuv420p -strict experimental -r 30 -t 2:20 -acodec aac -vb 1024k -minrate 1024k -maxrate 1024k -bufsize 1024k -ar 44100 -ac 2 working/OUTPUT_SMALL.mp4')
+        result = os.system('ffmpeg -loglevel warning -y -i working/atari800_output.avi -vcodec libx264 -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2,scale=1440:1080" -pix_fmt yuv420p -strict experimental -r 30 -t 2:20 -acodec aac -vb 1024k -minrate 1024k -maxrate 1024k -bufsize 1024k -ar 44100 -ac 2 working/OUTPUT_SMALL.mp4')
         #per https://gist.github.com/nikhan/26ddd9c4e99bbf209dd7#gistcomment-3232972
 
         logger.info("Uploading video")
@@ -227,7 +227,6 @@ def check_mentions(api, since_id):
         logger.info(f"Media ID is {media.media_id}")
 
         time.sleep(5)
-#TODO replace with get_media_upload_status per https://github.com/tweepy/tweepy/pull/1414
 
         logger.info(f"Posting message to @{message.user.name}")
         toottext = f"@{message.user.name} "
@@ -260,9 +259,17 @@ def main():
     logger.info(f"Starting since_id {since_id}")
 
     while True:
+        #cleanup previous run
+        if os.path.exists("working/disk.atr"):
+            os.remove("working/disk.atr")
+        if os.path.exists("working/atari800_output.avi"):
+            os.remove("working/atari800_output.avi")
+        if os.path.exists("working/OUTPUT_SMALL.mp4"):
+            os.remove("working/OUTPUT_SMALL.mp4")
+        if os.path.exists("working/OUTPUT_BIG.mp4"):
+            os.remove("working/OUTPUT_BIG.mp4")
         didamessage=0
         new_since_id = check_mentions(api, since_id)
-
         if new_since_id != since_id:
             since_id = new_since_id
             logger.info(f"Since_id now {since_id}")
