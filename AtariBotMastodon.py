@@ -143,7 +143,7 @@ def check_mentions(api, since_id):
 
         if language==0: #BASIC
             #tokenize BASIC program
-            result = os.popen('basicParser -b -f -k -o working/AUTORUN.BAS working/incomingBASIC.txt').read()
+            result = os.popen('basicParser -b -f -k -o working/AUTORUN.BAS working/incomingBASIC.txt 2>&1').read()
             if "error:" in result:
                 logger.info("!!! PARSER FAILED, SKIPPING")
                 api.reply(message, result[:200])
