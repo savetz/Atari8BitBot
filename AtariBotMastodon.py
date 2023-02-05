@@ -143,7 +143,7 @@ def check_mentions(api, since_id):
 
         if language==0: #BASIC
             #tokenize BASIC program
-            result = os.popen('basicParser -b -f -k -o working/AUTORUN.BAS working/incomingBASIC.txt')
+            result = os.popen('basicParser -b -f -k -o working/AUTORUN.BAS working/incomingBASIC.txt').read()
             if "error:" in result:
                 logger.info("!!! PARSER FAILED, SKIPPING")
                 api.reply(message, result[:200])
@@ -259,9 +259,17 @@ def main():
     logger.info(f"Starting since_id {since_id}")
 
     while True:
+        #cleanup previous run
+        if os.path.exists("working/disk.atr"):
+            os.remove("working/disk.atr")
+        if os.path.exists("working/atari800_output.avi"):
+            os.remove("working/movie.fmf")
+        if os.path.exists("working/OUTPUT_SMALL.mp4"):
+            os.remove("working/OUTPUT_SMALL.mp4")
+        if os.path.exists("working/OUTPUT_BIG.mp4"):
+            os.remove("working/OUTPUT_BIG.mp4")
         didamessage=0
         new_since_id = check_mentions(api, since_id)
-
         if new_since_id != since_id:
             since_id = new_since_id
             logger.info(f"Since_id now {since_id}")
