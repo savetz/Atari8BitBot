@@ -1,4 +1,5 @@
-#Atari8BitBot by @KaySavetz. 2020-2021.
+#Atari8BitBot by Kay Savetz 2020-2023. Mastodon: @savetz@oldbytes.space
+#Mastodon conversion by @papa_robot@mastodon.cloud
 
 import MastodonApi
 import logging
@@ -50,7 +51,7 @@ def check_mentions(api, since_id):
             starttime = int(result.group(1))
             logger.info(f" Requests start at {starttime} seconds")
         else:
-            starttime = 4
+            starttime = 3
 
         #look for length of time to record command
         exp = "{\w*?S(\d\d?)\w*(?:}|\s)" # {S\d\d  S= Seconds to record
@@ -74,14 +75,14 @@ def check_mentions(api, since_id):
         if re.search(exp,basiccode):
             language=3 #it's LOGO
             logger.info("it's LOGO")
-            if starttime==4:
+            if starttime==3:
                 starttime=0
 
         exp = "{\w*?C\w*(?:}|\s)" #{C
         if re.search(exp,basiccode):
             language=4 #it's Action!
             logger.info("it's Action!")
-            if starttime==4:
+            if starttime==3:
                 starttime=0
 
         exp = "{\w*?M\w*(?:}|\s)" #{M
@@ -187,65 +188,36 @@ def check_mentions(api, since_id):
             logger.error("Yikes! Langauge not valid")
             continue
 
+        cmd = 'assets/atari800 -config atari800.cfg -o working/atari800_output.avi '
+
+        if language==0: #BASIC
+            cmd += f'-rec off'
+        elif language==1: #PILOT
+            cmd += f'-cart assets/PILOT.ROM -cart-type 1 -rec off'
+        elif language==2: #ASM
+            cmd += f'-cart assets/ASM.rom -cart-type 1 -rec off'
+        elif language==3: #Logo
+            cmd += "-cart assets/logo.ROM -cart-type 2 -rec off -step 2s -type 'LOAD \"D:PROG{ret}'"
+        elif language==4: #Action!
+            cmd += '-cart assets/action.ROM -cart-type 15 -rec off '
+            cmd += " -step 60 -type '{shift}{ctrl}R' -step 5 -type 'D:BOT.ACT{ret}'"
+            cmd += " -step 200 -type '{shift}{ctrl}M' -step 30 -type 'COMPILE{ret}'"
+            cmd += " -step 400 -type 'RUN{ret}'"
+        elif language==5: #MS BASIC
+            cmd += "-cart assets/MSBASIC.bin -cart-type 2 -rec off -step 1s"
+            cmd += " -type 'LOAD \"D:BOT.BAS{ret}' -step 1s -type 'RUN{ret}'"
+        elif language==6: #SuperPILOT
+            cmd += '-rec off -step 4s'
+            cmd += " -type 'LOAD D:PROG{ret}'"
+            cmd += " -step 1s -type 'RUN{ret}'"
+
+        cmd += f' -step {starttime}s -rec on -step {recordtime}s working/disk.atr'
 
         logger.info("Firing up emulator")
-        if language==0: #BASIC
-            cmd = '/usr/bin/atari800 -config atari800.cfg working/disk.atr'.split()
-        elif language==1: #PILOT
-            cmd = '/usr/bin/atari800 -config atari800.cfg -cart assets/PILOT.ROM -cart-type 1 working/disk.atr'.split()
-        elif language==2: #ASM
-            cmd = '/usr/bin/atari800 -config atari800.cfg -cart assets/ASM.rom -cart-type 1 working/disk.atr'.split()
-        elif language==3: #Logo
-            cmd = '/usr/bin/atari800 -config atari800.cfg -cart assets/logo.ROM -cart-type 2 working/disk.atr'.split()
-        elif language==4: #Action!
-            cmd = '/usr/bin/atari800 -config atari800.cfg -cart assets/action.ROM -cart-type 15 working/disk.atr'.split()
-        elif language==5: #MS BASIC
-            cmd = '/usr/bin/atari800 -config atari800.cfg -cart assets/MSBASIC.bin -cart-type 2 working/disk.atr'.split()
-        elif language==6: #SuperPILOT
-            cmd = '/usr/bin/atari800 -config atari800.cfg working/disk.atr'.split()
-
-
-        emuPid = subprocess.Popen(cmd, env={"DISPLAY": ":98","SDL_AUDIODRIVER": "dummy"})
-        logger.info(f"   Process ID {emuPid.pid}")
-
-        if language==3: #Logo
-            time.sleep(7) #time to boot before typing
-            logger.info("Typing logo commands")
-            os.system('xdotool search --class atari type --delay 200 \'LOAD "D:PROG\r\'')
-
-        if language==5: #MS BASIC
-            time.sleep(7) #time to boot before typing
-            logger.info("Typing BASIC RUN command")
-            os.system('xdotool search --class atari type --delay 200 \'LOAD "D:BOT.BAS\r\'')
-            time.sleep(3)
-            os.system('xdotool type --delay 200 \'RUN\r\'')
-
-        if language==6: #SuperPILOT
-            time.sleep(7) #time to boot before typing
-            logger.info("Typing PILOT commands")
-            os.system('xdotool search --class atari type --delay 200 \'LOAD D:PROG\r\'')
-            time.sleep(5)
-            os.system('xdotool type --delay 200 \'RUN\r\'')
-
-        if language==4: #Action!
-            time.sleep(6) #time to boot before typing
-            logger.info("Typing Action! commands")
-            os.system('xdotool search --class atari key --delay 200 ctrl+shift+R  type --delay 200 \'D:BOT.ACT\r\'')
-            time.sleep(5)
-            os.system('xdotool key --delay 200 ctrl+shift+M type --delay 200 \'COMPILE\r\'')
-            time.sleep(14)
-            os.system('xdotool type --delay 200 \'RUN\r\'')
-
-        time.sleep(starttime)
-
-        logger.info("Recording with ffmpeg")
-        result = os.system(f'/usr/bin/ffmpeg -y -hide_banner -loglevel warning -f x11grab -r 30 -video_size 672x440 -i :98 -q:v 0 -pix_fmt yuv422p  -t {recordtime} working/OUTPUT_BIG.mp4')
-
-        logger.info("Stopping emulator")
-        emuPid.kill()
+        os.system(cmd)
 
         logger.info("Converting video")
-        result = os.system('ffmpeg -loglevel warning -y -i working/OUTPUT_BIG.mp4 -vcodec libx264 -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" -pix_fmt yuv420p -strict experimental -r 30 -t 2:20 -acodec aac -vb 1024k -minrate 1024k -maxrate 1024k -bufsize 1024k -ar 44100 -ac 2 working/OUTPUT_SMALL.mp4')
+        result = os.system('ffmpeg -loglevel warning -y -i working/atari800_output.avi -vcodec libx264 -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" -pix_fmt yuv420p -strict experimental -r 30 -t 2:20 -acodec aac -vb 1024k -minrate 1024k -maxrate 1024k -bufsize 1024k -ar 44100 -ac 2 working/OUTPUT_SMALL.mp4')
         #per https://gist.github.com/nikhan/26ddd9c4e99bbf209dd7#gistcomment-3232972
 
         logger.info("Uploading video")
@@ -287,8 +259,6 @@ def main():
     since_id = int(since_id)
     logger.info(f"Starting since_id {since_id}")
 
-    os.environ["DISPLAY"] = ":98"
-
     while True:
         didamessage=0
         new_since_id = check_mentions(api, since_id)
@@ -308,4 +278,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
