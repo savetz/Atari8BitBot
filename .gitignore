@@ -1,0 +1,12 @@
+#use this filename to run with secrets
+run_local.sh
+examples
+#non-shareable assets, avoid to add them to git
+assets/TBXL.atr
+assets/logo.ROM
+assets/PILOT.ROM
+assets/action.ROM
+assets/MSBASIC.bin
+assets/action.atr
+assets/PILOTII.atr
+assets/ATARIXL.ROM
