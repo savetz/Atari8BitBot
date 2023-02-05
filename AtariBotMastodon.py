@@ -188,7 +188,8 @@ def check_mentions(api, since_id):
             logger.error("Yikes! Langauge not valid")
             continue
 
-        cmd = 'assets/atari800 -config atari800.cfg -o working/atari800_output.avi '
+        #put assets/atari800 on path instead of hardcode it
+        cmd = 'atari800 -config atari800.cfg -o working/atari800_output.avi '
 
         if language==0: #BASIC
             cmd += f'-rec off'
@@ -227,7 +228,6 @@ def check_mentions(api, since_id):
         logger.info(f"Media ID is {media.media_id}")
 
         time.sleep(5)
-#TODO replace with get_media_upload_status per https://github.com/tweepy/tweepy/pull/1414
 
         logger.info(f"Posting message to @{message.user.name}")
         toottext = f"@{message.user.name} "
