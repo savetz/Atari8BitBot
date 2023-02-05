@@ -239,7 +239,7 @@ def check_mentions(api, since_id):
         time.sleep(starttime)
 
         logger.info("Recording with ffmpeg")
-        result = os.system(f'/usr/bin/ffmpeg -y -hide_banner -loglevel warning -f x11grab -r 30 -video_size 672x440 -i :99 -q:v 0 -pix_fmt yuv422p -t {recordtime} working/OUTPUT_BIG.mp4')
+        result = os.system(f'/usr/bin/ffmpeg -y -hide_banner -loglevel warning -f x11grab -r 30 -video_size 672x440 -i :99 -q:v 0 -pix_fmt yuv422p -f alsa -ac 2 -i pulse -acodec aac -strict experimental  -t {recordtime} working/OUTPUT_BIG.mp4')
 
         logger.info("Stopping emulator")
         emuPid.kill()
