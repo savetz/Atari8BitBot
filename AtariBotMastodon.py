@@ -211,7 +211,7 @@ def check_mentions(api, since_id):
             cmd += " -type 'LOAD D:PROG{ret}'"
             cmd += " -step 1s -type 'RUN{ret}'"
 
-        cmd += f' -step {starttime}s -rec on -step {recordtime}s working/disk.atr 2>/dev/null'
+        cmd += f' -step {starttime}s -rec on -step {recordtime}s working/disk.atr 2>&1 >/dev/null'
 
         logger.info("Firing up emulator")
         os.system(cmd)
