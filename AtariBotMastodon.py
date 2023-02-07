@@ -32,7 +32,7 @@ def check_mentions(api, since_id):
         basiccode = basiccode.replace("&lt;", "<")
         basiccode = basiccode.replace("&gt;", ">")
         basiccode = basiccode.replace("&amp;", "&")
-        #replace typogrphical quotes
+        #replace typographical quotes
         lead_double = u"\u201c"
         follow_double = u"\u201d"
         lead_single = u"\u2018"
@@ -114,13 +114,13 @@ def check_mentions(api, since_id):
                         newcode = newcode + " "
                 except:
                     logger.info(f"could not dissect line {line}")
-                newcode = newcode + line
+                newcode = newcode + line.strip()
                 lineNum+=1
             basiccode=newcode
 
         #remove any { command
         #exp = "{\w*(?:}|\s)" #{anything till space or }
-        exp = "\s*{\w*(?:}\s*)" #{anything till } plus sourrounding whitespace
+        exp = "{\w*(?:}\s*)" #{anything till } plus trailing whitespace
         basiccode = re.sub(exp,'',basiccode)
 
         #whitespace
