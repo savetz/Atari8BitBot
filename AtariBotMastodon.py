@@ -114,7 +114,7 @@ def check_mentions(api, since_id):
                         newcode = newcode + " "
                 except:
                     logger.info(f"could not dissect line {line}")
-                newcode = newcode + line.strip()
+                newcode = newcode + line
                 lineNum+=1
             basiccode=newcode
 
