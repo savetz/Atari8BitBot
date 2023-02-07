@@ -75,5 +75,5 @@ class MastodonApi:
             message['urls']=[]
         for link in all_links:
             message['urls'].append( {'expanded_url': link.get('href')} )
-        message['text']=soup.get_text(strip=True,separator="\n")
+        message['text']=soup.get_text(separator="\n")
         return message
