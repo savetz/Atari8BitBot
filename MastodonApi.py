@@ -75,6 +75,5 @@ class MastodonApi:
             message['urls']=[]
         for link in all_links:
             message['urls'].append( {'expanded_url': link.get('href')} )
-        expr = re.compile("#zspectrumbot", re.IGNORECASE)
-        message['text']=expr.sub("",soup.get_text(separator="\n"))
+        message['text']=soup.get_text(strip=True,separator="\n")
         return message
