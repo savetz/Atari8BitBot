@@ -120,7 +120,7 @@ def check_mentions(api, since_id):
 
         #remove any { command
         #exp = "{\w*(?:}|\s)" #{anything till space or }
-        exp = "{\w*(?:}\s*)" #{anything till } plus trailing whitespace
+        exp = "\s*{\w*(?:}\s*)" #{anything till } plus sourrounding whitespace
         basiccode = re.sub(exp,'',basiccode)
 
         #whitespace
