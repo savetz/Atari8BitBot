@@ -57,7 +57,7 @@ class MastodonApi:
             status.user=SimpleNamespace()
             status.user.screen_name=toot.account.display_name
             status.user.name=toot.account.acct
-            status.full_text=message['text']
+            status.full_text=message['text'].strip()
             replies[status.id]=status
             Self.logger.debug(f"status: {status.id}")
         Self.logger.info(f"replies: {replies}")
@@ -75,5 +75,5 @@ class MastodonApi:
             message['urls']=[]
         for link in all_links:
             message['urls'].append( {'expanded_url': link.get('href')} )
-        message['text']=soup.get_text(strip=True,separator="\n").strip()
+        message['text']=soup.get_text(strip=True,separator="\n")
         return message
