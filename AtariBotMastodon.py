@@ -32,7 +32,7 @@ def check_mentions(api, since_id):
         basiccode = basiccode.replace("&lt;", "<")
         basiccode = basiccode.replace("&gt;", ">")
         basiccode = basiccode.replace("&amp;", "&")
-        #replace typogrphical quotes
+        #replace typographical quotes
         lead_double = u"\u201c"
         follow_double = u"\u201d"
         lead_single = u"\u2018"
@@ -211,7 +211,7 @@ def check_mentions(api, since_id):
             cmd += " -type 'LOAD D:PROG{ret}'"
             cmd += " -step 1s -type 'RUN{ret}'"
 
-        cmd += f' -step {starttime}s -rec on -step {recordtime}s working/disk.atr'
+        cmd += f' -step {starttime}s -rec on -step {recordtime}s working/disk.atr >/dev/null'
 
         logger.info("Firing up emulator")
         os.system(cmd)
