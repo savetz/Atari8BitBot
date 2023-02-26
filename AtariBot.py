@@ -217,9 +217,11 @@ def check_mentions(api, since_id):
 
         logger.info("Firing up emulator")
         os.system(cmd)
-        scale=""
-        if backend=="mastodon":
-            scale=",scale=1440:1080"
+
+        scale=",scale=1440:1080"
+
+        if backend=="twitter":
+            scale=""
 
         logger.info("Converting video")
         result = os.system(f'ffmpeg -loglevel warning -y -i working/atari800_output.avi -vcodec libx264 -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2{scale}" -pix_fmt yuv420p -strict experimental -r 30 -t 2:20 -acodec aac -vb 1024k -minrate 1024k -maxrate 1024k -bufsize 1024k -ar 44100 -ac 2 working/OUTPUT_SMALL.mp4')
