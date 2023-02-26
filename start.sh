@@ -4,11 +4,18 @@
 #echo "109808029753084484" > sinceFile.txt
 #nohup Xvfb :99 > /dev/null 2>&1 &
 
+#select backend twitter/mastodon
+
+#export BACKEND="mastodon"
+#export MASTODON_SERVER="https://oldbytes.space/"
+
 #Add credentials here
 
-#export MASTODON_SERVER="https://oldbytes.space/"
 #export CONSUMER_KEY=""
 #export CONSUMER_SECRET=""
 #export ACCESS_TOKEN=""
 
-python3 AtariBotMastodon.py
+#need this one for twitter
+#export ACCESS_TOKEN_SECRET=""
+
+python3 AtariBot.py
