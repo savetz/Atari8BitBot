@@ -1,7 +1,7 @@
 
 
-import MastodonApi
-import TwitterApi
+from MastodonApi import MastodonApi
+from TwitterApi import TwitterApi
 
 import logging
 import os

@@ -1,8 +1,8 @@
 #!/bin/bash
 #uncomment for testing or in docker, this should be already existing in bm
 
-#echo "109808029753084484" > sinceFile.txt
-#nohup Xvfb :99 > /dev/null 2>&1 &
+echo "109910943006026066" > sinceFile.txt
+nohup Xvfb :99 > /dev/null 2>&1 &
 
 #select backend twitter/mastodon
 
