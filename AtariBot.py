@@ -234,8 +234,8 @@ def check_mentions(api, since_id):
         time.sleep(5)
 
         logger.info(f"Posting message to @{message.user.name}")
-        toottext = f"@{message.user.name} "
-        post_result = api.update_status(toottext, media, message.id)
+        text = f"@{message.user.name} "
+        post_result = api.update_status(text, media, message.id)
 
         logger.info("Done!")
 
