@@ -1,8 +1,10 @@
-#Atari8BitBot by @KaySavetz. 2020-2021.
+#Atari8BitBot by Kay Savetz 2020-2023. Mastodon: @savetz@oldbytes.space
+#Mastodon conversion by @papa_robot@mastodon.cloud
 
-import tweepy
+import MastodonApi
+import TwitterApi
 import logging
-from botConfig import create_api
+import botConfig
 import time
 from shutil import copyfile
 import os,sys
@@ -13,17 +15,18 @@ import re
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
+backend =""
 
 def check_mentions(api, since_id):
     logger.info("Retrieving mentions")
     new_since_id = since_id
-    for tweet in tweepy.Cursor(api.mentions_timeline, since_id=since_id, tweet_mode='extended').items():
-        new_since_id = max(tweet.id, new_since_id)
+    for message in api.get_replies(since_id):
+        new_since_id = max(message.id, new_since_id)
 
-        logger.info(f"Tweet from {tweet.user.name}")
+        logger.info(f"Message from {message.user.name}")
 
         #remove all @ mentions, leaving just the BASIC code
-        basiccode = re.sub('^(@.+?\s)+','',tweet.full_text)
+        basiccode = re.sub('^(@.+?\s)+','',message.full_text, re.ASCII)
 
         basiccode = unidecode(basiccode)
 
@@ -31,16 +34,26 @@ def check_mentions(api, since_id):
         basiccode = basiccode.replace("&lt;", "<")
         basiccode = basiccode.replace("&gt;", ">")
         basiccode = basiccode.replace("&amp;", "&")
+        #replace typographical quotes
+        lead_double = u"\u201c"
+        follow_double = u"\u201d"
+        lead_single = u"\u2018"
+        follow_single = u"\u2019"
+        basiccode = basiccode.replace(lead_double, '"')
+        basiccode = basiccode.replace(follow_double, '"')
+        basiccode = basiccode.replace(lead_single, "'")
+        basiccode = basiccode.replace(follow_single, "'")
+
 
 #determine language:
         #look for start time command
         exp = "{\w*?B(\d\d?)\w*(?:}|\s)" # {B\d\d  B= Begin
         result = re.search(exp,basiccode)
-        if result:  
+        if result:
             starttime = int(result.group(1))
             logger.info(f" Requests start at {starttime} seconds")
         else:
-            starttime = 4
+            starttime = 2
 
         #look for length of time to record command
         exp = "{\w*?S(\d\d?)\w*(?:}|\s)" # {S\d\d  S= Seconds to record
@@ -56,7 +69,7 @@ def check_mentions(api, since_id):
         language = 0 # default to BASIC
 
         exp = "{\w*?P\w*(?:}|\s)" #{P
-        if re.search(exp,basiccode): 
+        if re.search(exp,basiccode):
             language=1 #it's PILOT
             logger.info("it's PILOT")
 
@@ -64,14 +77,14 @@ def check_mentions(api, since_id):
         if re.search(exp,basiccode):
             language=3 #it's LOGO
             logger.info("it's LOGO")
-            if starttime==4:
+            if starttime==3:
                 starttime=0
 
         exp = "{\w*?C\w*(?:}|\s)" #{C
         if re.search(exp,basiccode):
             language=4 #it's Action!
             logger.info("it's Action!")
-            if starttime==4:
+            if starttime==3:
                 starttime=0
 
         exp = "{\w*?M\w*(?:}|\s)" #{M
@@ -85,7 +98,7 @@ def check_mentions(api, since_id):
             logger.info("it's SuperPILOT")
 
         exp = "{\w*?A\w*(?:}|\s)" #{A
-        if re.search(exp,basiccode): 
+        if re.search(exp,basiccode):
             language=2 #it's Assembly
             logger.info("it's ASM")
 
@@ -132,11 +145,11 @@ def check_mentions(api, since_id):
 
         if language==0: #BASIC
             #tokenize BASIC program
-            result = os.system('basicParser -b -f -k -o working/AUTORUN.BAS working/incomingBASIC.txt')
-            if result==256:
+            result = os.popen('basicParser -b -f -k -o working/AUTORUN.BAS working/incomingBASIC.txt 2>&1').read()
+            if "error:" in result:
                 logger.info("!!! PARSER FAILED, SKIPPING")
+                api.reply(message, result[:200])
                 continue
-
 
         if language==0: #BASIC
             logger.info("Making disk image, moving tokenized BASIC")
@@ -177,79 +190,54 @@ def check_mentions(api, since_id):
             logger.error("Yikes! Langauge not valid")
             continue
 
+        cmd = 'assets/atari800 -config atari800.cfg -o working/atari800_output.avi '
+
+        if language==0: #BASIC
+            cmd += f'-rec off'
+        elif language==1: #PILOT
+            cmd += f'-cart assets/PILOT.ROM -cart-type 1 -rec off'
+        elif language==2: #ASM
+            cmd += f'-cart assets/ASM.rom -cart-type 1 -rec off'
+        elif language==3: #Logo
+            cmd += "-cart assets/logo.ROM -cart-type 2 -rec off -step 2s -type 'LOAD \"D:PROG{ret}'"
+        elif language==4: #Action!
+            cmd += '-cart assets/action.ROM -cart-type 15 -rec off '
+            cmd += " -step 60 -type '{shift}{ctrl}R' -step 5 -type 'D:BOT.ACT{ret}'"
+            cmd += " -step 200 -type '{shift}{ctrl}M' -step 30 -type 'COMPILE{ret}'"
+            cmd += " -step 400 -type 'RUN{ret}'"
+        elif language==5: #MS BASIC
+            cmd += "-cart assets/MSBASIC.bin -cart-type 2 -rec off -step 1s"
+            cmd += " -type 'LOAD \"D:BOT.BAS{ret}' -step 1s -type 'RUN{ret}'"
+        elif language==6: #SuperPILOT
+            cmd += '-rec off -step 4s'
+            cmd += " -type 'LOAD D:PROG{ret}'"
+            cmd += " -step 1s -type 'RUN{ret}'"
+
+        cmd += f' -step {starttime}s -rec on -step {recordtime}s working/disk.atr >/dev/null'
 
         logger.info("Firing up emulator")
-        if language==0: #BASIC
-            cmd = '/usr/bin/atari800 -config atari800.cfg working/disk.atr'.split()
-        elif language==1: #PILOT
-            cmd = '/usr/bin/atari800 -config atari800.cfg -cart assets/PILOT.ROM -cart-type 1 working/disk.atr'.split()
-        elif language==2: #ASM
-            cmd = '/usr/bin/atari800 -config atari800.cfg -cart assets/ASM.rom -cart-type 1 working/disk.atr'.split()
-        elif language==3: #Logo
-            cmd = '/usr/bin/atari800 -config atari800.cfg -cart assets/logo.ROM -cart-type 2 working/disk.atr'.split()
-        elif language==4: #Action!
-            cmd = '/usr/bin/atari800 -config atari800.cfg -cart assets/action.ROM -cart-type 15 working/disk.atr'.split()
-        elif language==5: #MS BASIC
-            cmd = '/usr/bin/atari800 -config atari800.cfg -cart assets/MSBASIC.bin -cart-type 2 working/disk.atr'.split()
-        elif language==6: #SuperPILOT
-            cmd = '/usr/bin/atari800 -config atari800.cfg working/disk.atr'.split()
+        os.system(cmd)
 
+        scale=",scale=1440:1080"
 
-        emuPid = subprocess.Popen(cmd, env={"DISPLAY": ":99","SDL_AUDIODRIVER": "dummy"})
-        logger.info(f"   Process ID {emuPid.pid}")
-
-        if language==3: #Logo
-            time.sleep(7) #time to boot before typing
-            logger.info("Typing logo commands")
-            os.system('xdotool search --class atari type --delay 200 \'LOAD "D:PROG\r\'')
-
-        if language==5: #MS BASIC
-            time.sleep(7) #time to boot before typing
-            logger.info("Typing BASIC RUN command")
-            os.system('xdotool search --class atari type --delay 200 \'LOAD "D:BOT.BAS\r\'')
-            time.sleep(3)
-            os.system('xdotool type --delay 200 \'RUN\r\'')
-
-        if language==6: #SuperPILOT
-            time.sleep(7) #time to boot before typing
-            logger.info("Typing PILOT commands")
-            os.system('xdotool search --class atari type --delay 200 \'LOAD D:PROG\r\'')
-            time.sleep(5)
-            os.system('xdotool type --delay 200 \'RUN\r\'')
-
-        if language==4: #Action!
-            time.sleep(6) #time to boot before typing
-            logger.info("Typing Action! commands")
-            os.system('xdotool search --class atari key --delay 200 ctrl+shift+R  type --delay 200 \'D:BOT.ACT\r\'')
-            time.sleep(5)
-            os.system('xdotool key --delay 200 ctrl+shift+M type --delay 200 \'COMPILE\r\'')
-            time.sleep(14)
-            os.system('xdotool type --delay 200 \'RUN\r\'')
-
-        time.sleep(starttime)
-
-        logger.info("Recording with ffmpeg")
-        result = os.system(f'/usr/bin/ffmpeg -y -hide_banner -loglevel warning -f x11grab -r 30 -video_size 672x440 -i :99 -q:v 0 -pix_fmt yuv422p -t {recordtime} working/OUTPUT_BIG.mp4')
-
-        logger.info("Stopping emulator")
-        emuPid.kill()
+        if backend=="twitter":
+            scale=""
 
         logger.info("Converting video")
-        result = os.system('ffmpeg -loglevel warning -y -i working/OUTPUT_BIG.mp4 -vcodec libx264 -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" -pix_fmt yuv420p -strict experimental -r 30 -t 2:20 -acodec aac -vb 1024k -minrate 1024k -maxrate 1024k -bufsize 1024k -ar 44100 -ac 2 working/OUTPUT_SMALL.mp4')
+        result = os.system(f'ffmpeg -loglevel warning -y -i working/atari800_output.avi -vcodec libx264 -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2{scale}" -pix_fmt yuv420p -strict experimental -r 30 -t 2:20 -acodec aac -vb 1024k -minrate 1024k -maxrate 1024k -bufsize 1024k -ar 44100 -ac 2 working/OUTPUT_SMALL.mp4')
         #per https://gist.github.com/nikhan/26ddd9c4e99bbf209dd7#gistcomment-3232972
 
-        logger.info("Uploading video")  
+        logger.info("Uploading video")
 
         media = api.media_upload("working/OUTPUT_SMALL.mp4")
 
         logger.info(f"Media ID is {media.media_id}")
 
         time.sleep(5)
-#TODO replace with get_media_upload_status per https://github.com/tweepy/tweepy/pull/1414
 
-        logger.info(f"Posting tweet to @{tweet.user.screen_name}")
-        tweettext = f"@{tweet.user.screen_name} "
-        post_result = api.update_status(auto_populate_reply_metadata=False, status=tweettext, media_ids=[media.media_id], in_reply_to_status_id=tweet.id)
+        logger.info(f"Posting message to @{message.user.name}")
+        text = f"@{message.user.name} "
+        post_result = api.update_status(text, media, message.id)
 
         logger.info("Done!")
 
@@ -257,12 +245,15 @@ def check_mentions(api, since_id):
 
 def main():
     os.chdir('/home/atari8/bot/')
-
-    api = create_api()
+    backend =  os.getenv('BACKEND')
+    if backend=='twitter':
+        api = botConfig.create_api_twitter()
+    else:
+        api = botConfig.create_api_mastodon()
 
     now = datetime.now()
     logger.info("START TIME:")
-    logger.info(now.strftime("%Y %m %d %H:%M:%S")) 
+    logger.info(now.strftime("%Y %m %d %H:%M:%S"))
 
     try:
         sinceFile = open('sinceFile.txt','r')
@@ -273,29 +264,34 @@ def main():
         logger.info("created new sinceFile")
         since_id = 1
 
-    sinceFile.close()       
+    sinceFile.close()
     since_id = int(since_id)
     logger.info(f"Starting since_id {since_id}")
-    
-    os.environ["DISPLAY"] = ":99"
 
     while True:
-        didatweet=0
+        #cleanup previous run
+        if os.path.exists("working/disk.atr"):
+            os.remove("working/disk.atr")
+        if os.path.exists("working/atari800_output.avi"):
+            os.remove("working/atari800_output.avi")
+        if os.path.exists("working/OUTPUT_SMALL.mp4"):
+            os.remove("working/OUTPUT_SMALL.mp4")
+        if os.path.exists("working/OUTPUT_BIG.mp4"):
+            os.remove("working/OUTPUT_BIG.mp4")
+        didamessage=0
         new_since_id = check_mentions(api, since_id)
-
         if new_since_id != since_id:
             since_id = new_since_id
             logger.info(f"Since_id now {since_id}")
-        
+
             sinceFile = open('sinceFile.txt','w')
             sinceFile.write(str(since_id))
             sinceFile.close()
-            didatweet=1
+            didamessage=1
 
-        if didatweet==0:
+        if didamessage==0:
             logger.info("Waiting...")
             time.sleep(120)
 
 if __name__ == "__main__":
     main()
-    

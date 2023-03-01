@@ -1,5 +1,6 @@
 docker build . -t ataribot
 docker run --rm -e MASTODON_SERVER="https://mastodon.cloud/" \
+-e BACKEND="mastodon" \
 -e CONSUMER_KEY= \
 -e CONSUMER_SECRET= \
 -e ACCESS_TOKEN= \

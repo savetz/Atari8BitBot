@@ -39,4 +39,4 @@ ENV PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/usr/local/sbin
 
 RUN mkdir -p working
 
-CMD ./start_mastodon.sh
+CMD ./start.sh
