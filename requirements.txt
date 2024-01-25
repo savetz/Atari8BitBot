@@ -1,4 +1,4 @@
 tweepy
 unidecode
-Mastodon.py>=1.7.0
+Mastodon.py>=1.8.1
 bs4
