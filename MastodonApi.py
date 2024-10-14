@@ -4,7 +4,6 @@ import re
 import os
 
 from types import SimpleNamespace
-from bs4 import BeautifulSoup
 
 class MastodonApi:
     logging.basicConfig(level=logging.INFO)
@@ -65,15 +64,7 @@ class MastodonApi:
 
     def extract_entities(Self,html_doc):
         message={}
-        soup = BeautifulSoup(html_doc, 'html.parser')
-        #Remove mention and hashtag
-        mentions=soup.find_all("a", class_="mention")
-        for m in mentions:
-            m.decompose()
-        all_links=soup.find_all('a',attrs={'target':'_blank'} )
-        if all_links:
-            message['urls']=[]
-        for link in all_links:
-            message['urls'].append( {'expanded_url': link.get('href')} )
-        message['text']=soup.get_text(separator="\n")
+        html_doc=re.sub('<br />', '\n', html_doc)
+        html_doc=re.sub('<[^<]+?>', '', html_doc)
+        message['text']=re.sub('#atari8bitbot\s?', '', html_doc, flags=re.IGNORECASE)
         return message

@@ -5,20 +5,22 @@ import logging
 import re
 import os
 
+
+def extract_entities(html_doc):
+     message={}
+     html_doc=re.sub('<br />', '\n', html_doc)
+     html_doc=re.sub('<[^<]+?>', '', html_doc)
+     message['text']=re.sub('#atari8bitbot\s?', '', html_doc, flags=re.IGNORECASE)
+     return message
+
 client_id=''
 client_secret=''
 access_token=''
 api=Mastodon(client_id, client_secret, access_token, "https://oldbytes.space/" )
-result=api.timeline_hashtag("atari8bitbot", since_id=111631532029675227)
 
+result=api.timeline_hashtag("atari8bitbot", since_id=113303264515021670)
 for toot in result:
-     print(toot['id'])
-     print(toot['account']['username'])
-
-print("----")
-
-result=api.search("#atari8bitbot", result_type="statuses",exclude_unreviewed=False, min_id=111631532029675227)
-
-for toot in result['statuses']:
-    print(toot['id'])
-    print(toot['account']['username'])
+    print(toot.content)
+    print("----")
+    print(extract_entities(toot.content))
+    #print(toot['account']['username'])
