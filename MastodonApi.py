@@ -65,6 +65,7 @@ class MastodonApi:
     def extract_entities(Self,html_doc):
         message={}
         html_doc=re.sub('<br />', '\n', html_doc)
+        html_doc=re.sub('</p>', '\n', html_doc)
         html_doc=re.sub('<[^<]+?>', '', html_doc)
         message['text']=re.sub('#atari8bitbot\s?', '', html_doc, flags=re.IGNORECASE)
         return message

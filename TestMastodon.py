@@ -18,7 +18,7 @@ client_secret=''
 access_token=''
 api=Mastodon(client_id, client_secret, access_token, "https://oldbytes.space/" )
 
-result=api.timeline_hashtag("atari8bitbot", since_id=113303264515021670)
+result=api.timeline_hashtag("atari8bitbot", since_id=113303702916012370)
 for toot in result:
     print(toot.content)
     print("----")
