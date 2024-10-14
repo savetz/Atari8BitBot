@@ -1,4 +1,5 @@
 from mastodon import Mastodon
+from bs4 import BeautifulSoup as bs
 import logging
 import re
 import os
@@ -64,8 +65,12 @@ class MastodonApi:
 
     def extract_entities(Self,html_doc):
         message={}
+
         html_doc=re.sub('<br />', '\n', html_doc)
         html_doc=re.sub('</p>', '\n', html_doc)
         html_doc=re.sub('<[^<]+?>', '', html_doc)
-        message['text']=re.sub('#atari8bitbot\s?', '', html_doc, flags=re.IGNORECASE)
+        html_doc=re.sub('#atari8bitbot\s?', '', html_doc, flags=re.IGNORECASE)
+        soup = bs(html_doc, 'html.parser')
+        message['text'] = soup.get_text(separator="\n")
+
         return message
