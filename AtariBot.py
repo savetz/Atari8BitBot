@@ -43,7 +43,7 @@ def check_mentions(api, since_id):
         basiccode = basiccode.replace(follow_double, '"')
         basiccode = basiccode.replace(lead_single, "'")
         basiccode = basiccode.replace(follow_single, "'")
-
+        basiccode = basiccode.replace("&quot;", '"')
 
 #determine language:
         #look for start time command
