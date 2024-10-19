@@ -65,7 +65,8 @@ class MastodonApi:
 
     def extract_entities(Self,html_doc):
         message={}
-        html_doc=re.sub('<br\s*\/?>', '\n', html_doc)
+        html_doc=re.sub(r'<br[\s]*/?>', '\n', html_doc)
+        html_doc=re.sub(r'</p>', '\n', html_doc)
         html_doc=re.sub('<[^<]+?>', '', html_doc)
         html_doc=re.sub('#atari8bitbot\s?', '', html_doc, flags=re.IGNORECASE)
         soup = bs(html_doc, 'html.parser')
