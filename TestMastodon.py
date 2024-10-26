@@ -9,10 +9,10 @@ import os
 
 def extract_entities(html_doc):
      message={}
-     html_doc=re.sub('<br />', '\n', html_doc)
-     html_doc=re.sub('</p>', '\n', html_doc)
-     html_doc=re.sub('<[^<]+?>', '', html_doc)
-     html_doc=re.sub('#atari8bitbot\s?', '', html_doc, flags=re.IGNORECASE)
+     html_doc=re.sub(r'<br\s*/?>', '\n', html_doc)
+     html_doc=re.sub(r'</p>', '\n', html_doc)
+     html_doc=re.sub(r'<[^<]+?>', '', html_doc)
+     html_doc=re.sub(r'#atari8bitbot\s?', '', html_doc, flags=re.IGNORECASE)
      soup = bs(html_doc, 'html.parser')
      message['text'] = soup.get_text(separator="\n")
      return message
