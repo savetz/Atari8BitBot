@@ -1,8 +1,6 @@
 #Atari8BitBot by Kay Savetz 2020-2023. Mastodon: @savetz@oldbytes.space
 #Mastodon conversion by @papa_robot@mastodon.cloud
 
-import MastodonApi
-import TwitterApi
 import logging
 import botConfig
 import time
@@ -13,7 +11,7 @@ from datetime import datetime
 from unidecode import unidecode
 import re
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger()
 backend =""
 
@@ -45,7 +43,7 @@ def check_mentions(api, since_id):
         basiccode = basiccode.replace(follow_single, "'")
         basiccode = basiccode.replace("&quot;", '"')
 
-#determine language:
+        #determine language:
         #look for start time command
         exp = "{\w*?B(\d\d?)\w*(?:}|\s)" # {B\d\d  B= Begin
         result = re.search(exp,basiccode)
@@ -248,8 +246,10 @@ def main():
     backend =  os.getenv('BACKEND')
     if backend=='twitter':
         api = botConfig.create_api_twitter()
-    else:
+    elif backend=='mastodon':
         api = botConfig.create_api_mastodon()
+    else:
+        api = botConfig.create_api_bluesky()
 
     now = datetime.now()
     logger.info("START TIME:")
