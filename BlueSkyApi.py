@@ -1,5 +1,6 @@
 
-from blueskysocial import Client, Post, Video
+from atproto import Client, client_utils
+from atproto_client import models
 from bs4 import BeautifulSoup as bs
 import logging
 import re
@@ -19,17 +20,16 @@ class BlueSkyApi:
         return Self.api
 
     def media_upload(Self,filename):
-        video = Video(filename)
-        #TODO post data
-        media = Post('Your Video', with_attachments=video)
-        Self.api.post(media)
+        video = open(filename, 'rb')
+        vid_data = video.read()
+        media=Self.api.send_video(video=vid_data)
         return media
 
     def update_status(Self,text, media ,id):
-        status= Self.api.post(text,in_reply_to_id=id, media_ids=[media.media_id])
+        status= Self.api.send_post(text=text,reply_to=id, embed=media)
         return status
 
-    def reply(Self, toot, text):
+    def reply(Self, post, text):
 
         msg=" "
         for line in text.split("\n"):
@@ -39,7 +39,7 @@ class BlueSkyApi:
         Self.logger.info(f"MSG: {msg}")
         status = {}
         try:
-            status = Self.api.status_post(msg,in_reply_to_id=toot.id)
+            status = Self.api.send_post(text=msg,reply_to=post)
         except:
             Self.logger.error(f"Unable to post message: {status}")
 
