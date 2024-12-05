@@ -45,22 +45,29 @@ class BlueSkyApi:
 
     def get_replies(Self, since_id):
         replies={}
-        #result=api.search("#atari8bitbot", result_type="statuses",exclude_unreviewed=False, min_id=since_id)
-        result=Self.api.timeline_hashtag("atari8bitbot", since_id=since_id)
+        result = []
+        response = Self.api.t.app.bsky.feed.search_posts(
+            params = models.AppBskyFeedSearchPosts.Params(
+                q="#atari8bitbot"
+                since="f{since_id}"
+            )
+        )
+        result.extend(response.posts)
+
         Self.logger.debug(f"result: {result}")
-        for toot in result:
+        for post in result:
             #parse the message to extract entities
-            message=Self.extract_entities(toot.content)
+            message=Self.extract_entities(post.record.text)
             status=SimpleNamespace()
-            status.id = toot['id']
+            status.id = post.record.cid
             status.entities={}
             if 'urls' in message.keys():
                 if 'urls' not in status.entities.keys():
                     status.entities['urls']=[]
                 status.entities['urls']=message['urls']
             status.user=SimpleNamespace()
-            status.user.screen_name=toot.account.display_name
-            status.user.name=toot.account.acct
+            status.user.screen_name=post.account.display_name
+            status.user.name=post.account.acct
             status.full_text=message['text'].strip()
             replies[status.id]=status
             Self.logger.debug(f"status: {status.id}")
