@@ -28,16 +28,19 @@ for post in mentions:
     print(post.author.handle)
     print(post.cid)
 
+    video = open("examples/atari.mp4", 'rb')
+    vid_data = video.read()
     this_parent = models.create_strong_ref(post)
     this_root = models.create_strong_ref(post)
     tb = client_utils.TextBuilder()
     tb.text("AtariBotTest got ")
     tb.mention(post.author.display_name, post.author.did)
-    tb.text("'s post and replied, no media yet")
+    tb.text("'s post and replied, here is media")
     
-    client.send_post(
+    client.send_video(
         text=tb,
-        reply_to=models.AppBskyFeedPost.ReplyRef(parent=this_parent, root=this_root)
+        reply_to=models.AppBskyFeedPost.ReplyRef(parent=this_parent, root=this_root),
+        video=vid_data
     )
 
 
