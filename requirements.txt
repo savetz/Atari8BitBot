@@ -3,4 +3,4 @@
 unidecode
 Mastodon.py>=1.8.1
 bs4
-blueskysocial
+atproto
