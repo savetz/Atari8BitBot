@@ -66,8 +66,8 @@ class BlueSkyApi:
                     status.entities['urls']=[]
                 status.entities['urls']=message['urls']
             status.user=SimpleNamespace()
-            status.user.screen_name=post.account.display_name
-            status.user.name=post.account.acct
+            status.user.screen_name=post.author.display_name
+            status.user.name=post.author.handle
             status.full_text=message['text'].strip()
             replies[status.id]=status
             Self.logger.debug(f"status: {status.id}")

@@ -1,10 +1,4 @@
 FROM python:bullseye AS builder
-RUN apt clean
-#RUN echo "deb https://deb.debian.org/debian bullseye main \n" > /etc/apt/sources.list
-#RUN echo "deb https://archive.debian.org/debian stretch main \n" >> /etc/apt/sources.list
-#RUN echo "deb https://archive.debian.org/debian bullseye-updates main s \n" >> /etc/apt/sources.list
-#RUN echo "deb https://security.debian.org/debian-security bullseye-security main " >> /etc/apt/sources.list
-
 RUN apt update
 RUN apt install -yq peg gawk
 
