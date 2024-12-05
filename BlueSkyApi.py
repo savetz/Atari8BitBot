@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup as bs
 import logging
 import re
 import os
+import datetime
 
 from types import SimpleNamespace
 
@@ -20,36 +21,51 @@ class BlueSkyApi:
         return Self.api
 
     def media_upload(Self,filename):
-        video = open(filename, 'rb')
-        vid_data = video.read()
-        media=Self.api.send_video(video=vid_data)
-        return media
+        #just validate the videa file as reply does it
+       
+        return filename
 
     def update_status(Self,text, media ,id):
-        status= Self.api.send_post(text=text,reply_to=id, embed=media)
+        #this_parent = models.create_strong_ref(post)
+        #this_root = models.create_strong_ref(post)
+
+        video = open(media, 'rb')
+        vid_data = video.read()
+    
+        status= Self.api.send_video(
+            text        =   text,
+            reply_to    =   id,
+            video       =   vid_data
+            )
         return status
 
     def reply(Self, post, text):
-
         msg=" "
         for line in text.split("\n"):
             if "ERROR"  in line or "error:" in line:
                 msg=msg+line+"\n"
 
         Self.logger.info(f"MSG: {msg}")
+
+        this_parent = models.create_strong_ref(post)
+        this_root = models.create_strong_ref(post)
+
         status = {}
         try:
-            status = Self.api.send_post(text=msg,reply_to=post)
+            status = Self.api.send_post(
+                text=msg,
+                reply_to=models.AppBskyFeedPost.ReplyRef(parent=this_parent, root=this_root))
         except:
             Self.logger.error(f"Unable to post message: {status}")
 
     def get_replies(Self, since_id):
         replies={}
         result = []
+        since_date= datetime.date.fromtimestamp(since_id)
         response = Self.api.t.app.bsky.feed.search_posts(
             params = models.AppBskyFeedSearchPosts.Params(
-                q="#atari8bitbot"
-                since="f{since_id}"
+                q="#atari8bitbot",
+                since=f"{since_date.strftime('%Y-%m-%dT%H:%M:%SZ')}"
             )
         )
         result.extend(response.posts)
