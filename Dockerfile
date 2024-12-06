@@ -20,11 +20,12 @@ COPY nonfree.repo /etc/apt/sources.list.d/nonfree.list
 RUN useradd atari -d /home/atari8
 RUN apt update
 RUN apt install -yq ffmpeg xdotool xvfb libc6 libsdl1.2debian
+
 RUN mkdir -p /home/atari8/bot && chown atari /home/atari8/bot
+RUN mkdir -p /home/atari8/bot/working && chown -R atari /home/atari8/
 RUN mkdir -p /usr/local/franny/bin/
 
-COPY --chown=atari . /home/atari8/bot
-
+COPY --chown=atari . /home/atari8/bot/
 COPY --from=builder --chmod=755 /root/franny-1.1.3/franny /usr/local/franny/bin/
 COPY --from=builder --chmod=755 /root/tbxl-parser-10/build/basicParser /usr/local/bin/
 COPY --from=builder --chmod=755 /usr/local/bin/atari800 /home/atari8/bot/assets/

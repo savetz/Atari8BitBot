@@ -252,7 +252,7 @@ def main():
         api = botConfig.create_api_bluesky()
 
     now = datetime.now()
-    logger.info("START TIME:")
+    logger.info(f"START TIME: {now.timestamp()} ")
     logger.info(now.strftime("%Y %m %d %H:%M:%S"))
 
     try:
@@ -260,9 +260,9 @@ def main():
         since_id = sinceFile.read()
     except:
         sinceFile = open('sinceFile.txt','w')
-        sinceFile.write("1")
+        sinceFile.write("1733006601973608")
         logger.info("created new sinceFile")
-        since_id = 10001
+        since_id = "1733006601973608"
 
     sinceFile.close()
     since_id = int(since_id)

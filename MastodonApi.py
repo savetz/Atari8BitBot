@@ -27,7 +27,6 @@ class MastodonApi:
         return status
 
     def reply(Self, toot, text):
-
         msg=" "
         for line in text.split("\n"):
             if "ERROR"  in line or "error:" in line:

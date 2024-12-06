@@ -65,14 +65,14 @@ class BlueSkyApi:
     def get_replies(Self, since_id):
         replies={}
         result = []
-        since_date= datetime.date.fromtimestamp(since_id/1000)
+        since_date= datetime.datetime.fromtimestamp(since_id/1000000)
 
-        Self.logger.info(since_date.isoformat())
+        Self.logger.info(since_date.isoformat(timespec='milliseconds'))
 
         response = Self.api.app.bsky.feed.search_posts(
             params = models.AppBskyFeedSearchPosts.Params(
                 q="#atari8bitbot",
-                since=since_date.isoformat()
+                since=since_date.isoformat(timespec='milliseconds')+"Z"
             )
         )
         result.extend(response.posts)
@@ -84,7 +84,8 @@ class BlueSkyApi:
             status=SimpleNamespace()
             status.post=post
             ts=datetime.datetime.fromisoformat(post.record.created_at)
-            status.id = ts.timestamp()*1000
+            #offset 10 milliseconds to avoid getting the same message
+            status.id = int((ts.timestamp()+10000)*1000000)
             #status.id=post.cid
             status.entities={}
             if 'urls' in message.keys():
