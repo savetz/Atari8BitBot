@@ -42,8 +42,8 @@ def create_api_mastodon():
 
 
 def create_api_bluesky():
-    consumer_key =  os.getenv('USER')
-    consumer_secret = os.getenv('PASSWORD')
+    consumer_key =  os.getenv('CONSUMER_KEY')
+    consumer_secret = os.getenv('CONSUMER_SECRET')
     access_token = os.getenv('ACCESS_TOKEN')
     access_token_secret = ""
 

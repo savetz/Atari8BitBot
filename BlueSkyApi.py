@@ -10,37 +10,41 @@ import datetime
 from types import SimpleNamespace
 
 class BlueSkyApi:
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.DEBUG)
     logger = logging.getLogger()
     api = None
 
     def get_api(Self, client_id, client_secret, access_token, access_token_secret):
         c=Client()
-        c.authenticate(client_id, client_secret)
+        c.login(client_id, client_secret)
         Self.api=c
         return Self.api
 
     def media_upload(Self,filename):
         #just validate the videa file as reply does it
-       
         return filename
 
-    def update_status(Self,text, media ,id):
-        #this_parent = models.create_strong_ref(post)
-        #this_root = models.create_strong_ref(post)
+    def update_status(Self,text, media , msg):
+        post=msg.post
+
+        Self.logger.info(f"REPLYING TO: {post}")
+
+        this_parent = models.create_strong_ref(post)
+        this_root = models.create_strong_ref(post)
 
         video = open(media, 'rb')
         vid_data = video.read()
     
         status= Self.api.send_video(
             text        =   text,
-            reply_to    =   id,
+            reply_to    =   models.AppBskyFeedPost.ReplyRef(parent=this_parent, root=this_root),
             video       =   vid_data
             )
         return status
 
-    def reply(Self, post, text):
+    def reply(Self, status, text):
         msg=" "
+        post=status.post
         for line in text.split("\n"):
             if "ERROR"  in line or "error:" in line:
                 msg=msg+line+"\n"
@@ -61,11 +65,14 @@ class BlueSkyApi:
     def get_replies(Self, since_id):
         replies={}
         result = []
-        since_date= datetime.date.fromtimestamp(since_id)
-        response = Self.api.t.app.bsky.feed.search_posts(
+        since_date= datetime.date.fromtimestamp(since_id/1000)
+
+        Self.logger.info(since_date.isoformat())
+
+        response = Self.api.app.bsky.feed.search_posts(
             params = models.AppBskyFeedSearchPosts.Params(
                 q="#atari8bitbot",
-                since=f"{since_date.strftime('%Y-%m-%dT%H:%M:%SZ')}"
+                since=since_date.isoformat()
             )
         )
         result.extend(response.posts)
@@ -75,7 +82,10 @@ class BlueSkyApi:
             #parse the message to extract entities
             message=Self.extract_entities(post.record.text)
             status=SimpleNamespace()
-            status.id = post.record.cid
+            status.post=post
+            ts=datetime.datetime.fromisoformat(post.record.created_at)
+            status.id = ts.timestamp()*1000
+            #status.id=post.cid
             status.entities={}
             if 'urls' in message.keys():
                 if 'urls' not in status.entities.keys():

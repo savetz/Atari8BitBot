@@ -11,7 +11,7 @@ from datetime import datetime
 from unidecode import unidecode
 import re
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
 backend =""
 
@@ -229,13 +229,13 @@ def check_mentions(api, since_id):
 
         media = api.media_upload("working/OUTPUT_SMALL.mp4")
 
-        logger.info(f"Media ID is {media.media_id}")
+        logger.debug(f"Media ID is {media}")
 
         time.sleep(5)
 
         logger.info(f"Posting message to @{message.user.name}")
         text = f"@{message.user.name} "
-        post_result = api.update_status(text, media, message.id)
+        post_result = api.update_status(text, media, message)
 
         logger.info("Done!")
 
@@ -262,7 +262,7 @@ def main():
         sinceFile = open('sinceFile.txt','w')
         sinceFile.write("1")
         logger.info("created new sinceFile")
-        since_id = 1
+        since_id = 10001
 
     sinceFile.close()
     since_id = int(since_id)
