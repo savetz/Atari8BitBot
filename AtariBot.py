@@ -13,7 +13,7 @@ import re
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
-backend =""
+backend =  os.getenv('BACKEND')
 
 def check_mentions(api, since_id):
     logger.info("Retrieving mentions")
@@ -251,7 +251,7 @@ def main():
     if not home:
         home = '/home/atari8/bot/'
     os.chdir(home)
-    backend =  os.getenv('BACKEND')
+    
     if backend=='twitter':
         api = botConfig.create_api_twitter()
     elif backend=='mastodon':
