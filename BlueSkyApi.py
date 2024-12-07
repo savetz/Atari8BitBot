@@ -28,7 +28,7 @@ class BlueSkyApi:
     def update_status(Self,text, media , msg):
         post=msg.post
 
-        Self.logger.info(f"REPLYING TO: {post}")
+        Self.logger.debug(f"REPLYING TO: {post}")
 
         this_parent = models.create_strong_ref(post)
         this_root = models.create_strong_ref(post)
