@@ -242,7 +242,7 @@ def check_mentions(api, since_id):
     return new_since_id
 
 def main():
-    home = os.getenv('HOME')
+    home = os.getenv('RUN_HOME')
     if not home:
         home = '/home/atari8/bot/'
     os.chdir(home)
@@ -263,9 +263,9 @@ def main():
         since_id = sinceFile.read()
     except:
         sinceFile = open('sinceFile.txt','w')
-        sinceFile.write("1733006601973608")
+        sinceFile.write("173300660197")
         logger.info("created new sinceFile")
-        since_id = "1733006601973608"
+        since_id = "173300660197"
 
     sinceFile.close()
     since_id = int(since_id)
