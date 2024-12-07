@@ -21,7 +21,7 @@ def search_mentions(handle):
 
 
 client = Client()
-client.login('papa-robot.bsky.social', os.getenv('CONSUMER_SECRET'))
+client.login('atari8bitbot.bsky.social', os.getenv('CONSUMER_SECRET'))
 mentions = search_mentions("#atari8bitbot")
 for post in mentions:
     print(post.record.text)

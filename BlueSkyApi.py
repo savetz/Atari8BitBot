@@ -84,8 +84,8 @@ class BlueSkyApi:
             status=SimpleNamespace()
             status.post=post
             ts=datetime.datetime.fromisoformat(post.record.created_at)
-            #offset 10 milliseconds to avoid getting the same message
-            status.id = int( ts.timestamp()*1000 )
+            #offset 100 milliseconds to avoid getting the same message
+            status.id = int( ts.timestamp()*1000 + 100)
             #status.id=post.cid
             status.entities={}
             if 'urls' in message.keys():
