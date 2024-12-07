@@ -6,6 +6,7 @@ import logging
 import re
 import os
 import datetime
+from zoneinfo import ZoneInfo
 
 from types import SimpleNamespace
 
@@ -65,14 +66,14 @@ class BlueSkyApi:
     def get_replies(Self, since_id):
         replies={}
         result = []
-        since_date= datetime.datetime.fromtimestamp(since_id/1000)
+        since_date= datetime.datetime.fromtimestamp(since_id/1000, tz=ZoneInfo("UTC"))
 
         Self.logger.info(since_date.isoformat(timespec='milliseconds'))
 
         response = Self.api.app.bsky.feed.search_posts(
             params = models.AppBskyFeedSearchPosts.Params(
                 q="#atari8bitbot",
-                since=since_date.isoformat(timespec='milliseconds')+"Z"
+                since=since_date.isoformat(timespec='milliseconds')
             )
         )
         result.extend(response.posts)
