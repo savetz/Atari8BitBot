@@ -64,6 +64,10 @@ def check_mentions(api, since_id):
         if recordtime <1:
             recordtime=1
 
+        #Bluesky has a 30 second limit
+        if backend=="bluesky":
+            if recordtime>30: recordtime = 30
+
         language = 0 # default to BASIC
 
         exp = "{\w*?P\w*(?:}|\s)" #{P
@@ -234,7 +238,7 @@ def check_mentions(api, since_id):
         time.sleep(5)
 
         logger.info(f"Posting message to @{message.user.name}")
-        text = f"@{message.user.name} "
+        text = f"I ran {message.user.screen_name} ( @{message.user.name} ) code and got:"
         post_result = api.update_status(text, media, message)
 
         logger.info("Done!")
