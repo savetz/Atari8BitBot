@@ -242,7 +242,10 @@ def check_mentions(api, since_id):
     return new_since_id
 
 def main():
-    os.chdir('/home/atari8/bot/')
+    home = os.getenv('HOME')
+    if not home:
+        home = '/home/atari8/bot/'
+    os.chdir(home)
     backend =  os.getenv('BACKEND')
     if backend=='twitter':
         api = botConfig.create_api_twitter()
