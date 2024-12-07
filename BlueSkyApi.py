@@ -65,7 +65,7 @@ class BlueSkyApi:
     def get_replies(Self, since_id):
         replies={}
         result = []
-        since_date= datetime.datetime.fromtimestamp(since_id/1000000)
+        since_date= datetime.datetime.fromtimestamp(since_id/1000)
 
         Self.logger.info(since_date.isoformat(timespec='milliseconds'))
 
@@ -85,7 +85,7 @@ class BlueSkyApi:
             status.post=post
             ts=datetime.datetime.fromisoformat(post.record.created_at)
             #offset 10 milliseconds to avoid getting the same message
-            status.id = int((ts.timestamp()+10000)*1000000)
+            status.id = int( ts.timestamp()*1000 )
             #status.id=post.cid
             status.entities={}
             if 'urls' in message.keys():

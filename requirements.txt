@@ -1,6 +1,8 @@
 #deprecated
 #tweepy
 unidecode
+#Newer versions do not work in RPI bullseye, remove when updating
+cryptography==42.*
 Mastodon.py>=1.8.1
 bs4
 atproto
