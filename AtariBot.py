@@ -67,7 +67,7 @@ def check_mentions(api, since_id):
         #Bluesky has a 30 second limit
         if backend=="bluesky" and recordtime>=30:
             recordtime = 29
-            logger.info(f"Bluesky cannot upload {recordtime} seconds, cutting to 30")
+            logger.info(f"Bluesky cannot upload long videos cutting to 30")
 
         language = 0 # default to BASIC
 
