@@ -157,37 +157,37 @@ def check_mentions(api, since_id):
         if language==0: #BASIC
             logger.info("Making disk image, moving tokenized BASIC")
             copyfile('assets/TBXL.atr','working/disk.atr')
-            result = os.system('/usr/local/franny/bin/franny -A working/disk.atr -i working/AUTORUN.BAS -o AUTORUN.BAS')
+            result = os.system('franny -A working/disk.atr -i working/AUTORUN.BAS -o AUTORUN.BAS')
 
         elif language==1: #PILOT
             logger.info("Making disk image, moving text PILOT")
             copyfile('assets/pilot.atr','working/disk.atr')
-            result = os.system('/usr/local/franny/bin/franny -A working/disk.atr -i working/incomingBASIC.txt -o MENU.SYS')
+            result = os.system('franny -A working/disk.atr -i working/incomingBASIC.txt -o MENU.SYS')
 
         elif language==2: #ASM
             logger.info("Making disk image, moving text ASM")
             copyfile('assets/asm.atr','working/disk.atr')
-            result = os.system('/usr/local/franny/bin/franny -A working/disk.atr -i working/incomingBASIC.txt -o PROG')
+            result = os.system('franny -A working/disk.atr -i working/incomingBASIC.txt -o PROG')
 
         elif language==3: #Logo
             logger.info("Making disk image, moving text logo")
             copyfile('assets/dos2.atr','working/disk.atr')
-            result = os.system('/usr/local/franny/bin/franny -A working/disk.atr -i working/incomingBASIC.txt -o PROG')
+            result = os.system('franny -A working/disk.atr -i working/incomingBASIC.txt -o PROG')
 
         elif language==4: #Action!
             logger.info("Making disk image, moving action code")
             copyfile('assets/action.atr','working/disk.atr')
-            result = os.system('/usr/local/franny/bin/franny -A working/disk.atr -i working/incomingBASIC.txt -o BOT.ACT')
+            result = os.system('franny -A working/disk.atr -i working/incomingBASIC.txt -o BOT.ACT')
 
         elif language==5: #MS BASIC
             logger.info("Making disk image, moving MS BASIC code")
             copyfile('assets/MSBASIC.atr','working/disk.atr')
-            result = os.system('/usr/local/franny/bin/franny -A working/disk.atr -i working/incomingBASIC.txt -o BOT.BAS')
+            result = os.system('franny -A working/disk.atr -i working/incomingBASIC.txt -o BOT.BAS')
 
         elif language==6: #SuperPILOT
             logger.info("Making disk image, moving SuperPILOT code")
             copyfile('assets/PILOTII.atr','working/disk.atr')
-            result = os.system('/usr/local/franny/bin/franny -A working/disk.atr -i working/incomingBASIC.txt -o PROG')
+            result = os.system('franny -A working/disk.atr -i working/incomingBASIC.txt -o PROG')
 
         else:
             logger.error("Yikes! Langauge not valid")
