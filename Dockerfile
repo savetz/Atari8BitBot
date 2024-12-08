@@ -1,5 +1,4 @@
-FROM python:bullseye AS builder
-
+FROM python:3.12-bullseye AS builder
 RUN apt update
 RUN apt install -yq peg gawk
 
@@ -12,7 +11,7 @@ RUN wget -q --no-check-certificate https://github.com/dmsc/tbxl-parser/archive/r
 
 RUN git clone https://github.com/robmcmullen/atari800.git && cd atari800 && git checkout headless && ./autogen.sh && ./configure --target=headless && make && make install
 
-FROM  python:bullseye AS base
+FROM python:3.12-bullseye AS base
 
 ENV DEBIAN_FRONTEND=noninteractive
 COPY nonfree.repo /etc/apt/sources.list.d/nonfree.list
@@ -21,11 +20,12 @@ COPY nonfree.repo /etc/apt/sources.list.d/nonfree.list
 RUN useradd atari -d /home/atari8
 RUN apt update
 RUN apt install -yq ffmpeg xdotool xvfb libc6 libsdl1.2debian
+
 RUN mkdir -p /home/atari8/bot && chown atari /home/atari8/bot
+RUN mkdir -p /home/atari8/bot/working && chown -R atari /home/atari8/
 RUN mkdir -p /usr/local/franny/bin/
 
-COPY --chown=atari . /home/atari8/bot
-
+COPY --chown=atari . /home/atari8/bot/
 COPY --from=builder --chmod=755 /root/franny-1.1.3/franny /usr/local/franny/bin/
 COPY --from=builder --chmod=755 /root/tbxl-parser-10/build/basicParser /usr/local/bin/
 COPY --from=builder --chmod=755 /usr/local/bin/atari800 /home/atari8/bot/assets/
@@ -39,4 +39,4 @@ ENV PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/usr/local/sbin
 
 RUN mkdir -p working
 
-CMD ./start.sh
+CMD ["./start.sh"]

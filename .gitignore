@@ -11,3 +11,10 @@ assets/action.atr
 assets/PILOTII.atr
 assets/ATARIXL.ROM
 .venv
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+.DS_Store

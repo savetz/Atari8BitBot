@@ -1,1 +1,1 @@
-deb http://deb.debian.org/debian stretch contrib non-free
+deb http://archive.debian.org/debian stretch contrib non-free

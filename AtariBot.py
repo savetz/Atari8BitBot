@@ -1,8 +1,6 @@
 #Atari8BitBot by Kay Savetz 2020-2023. Mastodon: @savetz@oldbytes.space
 #Mastodon conversion by @papa_robot@mastodon.cloud
 
-import MastodonApi
-import TwitterApi
 import logging
 import botConfig
 import time
@@ -15,7 +13,7 @@ import re
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
-backend =""
+backend =  os.getenv('BACKEND')
 
 def check_mentions(api, since_id):
     logger.info("Retrieving mentions")
@@ -45,7 +43,7 @@ def check_mentions(api, since_id):
         basiccode = basiccode.replace(follow_single, "'")
         basiccode = basiccode.replace("&quot;", '"')
 
-#determine language:
+        #determine language:
         #look for start time command
         exp = "{\w*?B(\d\d?)\w*(?:}|\s)" # {B\d\d  B= Begin
         result = re.search(exp,basiccode)
@@ -65,6 +63,11 @@ def check_mentions(api, since_id):
             recordtime = 20
         if recordtime <1:
             recordtime=1
+
+        #Bluesky has a 30 second limit
+        if backend=="bluesky" and recordtime>=30:
+            recordtime = 29
+            logger.info(f"Bluesky cannot upload long videos cutting to 30")
 
         language = 0 # default to BASIC
 
@@ -231,28 +234,33 @@ def check_mentions(api, since_id):
 
         media = api.media_upload("working/OUTPUT_SMALL.mp4")
 
-        logger.info(f"Media ID is {media.media_id}")
+        logger.debug(f"Media ID is {media}")
 
         time.sleep(5)
 
         logger.info(f"Posting message to @{message.user.name}")
-        text = f"@{message.user.name} "
-        post_result = api.update_status(text, media, message.id)
+        text = f"I ran {message.user.screen_name} ( @{message.user.name} ) code and got:"
+        post_result = api.update_status(text, media, message)
 
         logger.info("Done!")
 
     return new_since_id
 
 def main():
-    os.chdir('/home/atari8/bot/')
-    backend =  os.getenv('BACKEND')
+    home = os.getenv('RUN_HOME')
+    if not home:
+        home = '/home/atari8/bot/'
+    os.chdir(home)
+    
     if backend=='twitter':
         api = botConfig.create_api_twitter()
-    else:
+    elif backend=='mastodon':
         api = botConfig.create_api_mastodon()
+    else:
+        api = botConfig.create_api_bluesky()
 
     now = datetime.now()
-    logger.info("START TIME:")
+    logger.info(f"START TIME: {now.timestamp()} ")
     logger.info(now.strftime("%Y %m %d %H:%M:%S"))
 
     try:
@@ -260,9 +268,9 @@ def main():
         since_id = sinceFile.read()
     except:
         sinceFile = open('sinceFile.txt','w')
-        sinceFile.write("1")
+        sinceFile.write("173300660197")
         logger.info("created new sinceFile")
-        since_id = 1
+        since_id = "173300660197"
 
     sinceFile.close()
     since_id = int(since_id)

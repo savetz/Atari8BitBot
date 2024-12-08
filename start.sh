@@ -2,20 +2,5 @@
 #uncomment for testing or in docker, this should be already existing in bm
 
 #echo "109910943006026066" > sinceFile.txt
-#nohup Xvfb :99 > /dev/null 2>&1 &
-
-#select backend twitter/mastodon
-
-#export BACKEND="mastodon"
-#export MASTODON_SERVER="https://oldbytes.space/"
-
-#Add credentials here
-
-#export CONSUMER_KEY=""
-#export CONSUMER_SECRET=""
-#export ACCESS_TOKEN=""
-
-#need this one for twitter
-#export ACCESS_TOKEN_SECRET=""
-
+nohup Xvfb :99 2>&1 &
 python3 AtariBot.py

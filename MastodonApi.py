@@ -21,12 +21,12 @@ class MastodonApi:
         media.media_id=mastodon_media.id
         return media
 
-    def update_status(Self,text, media ,id):
+    def update_status(Self,text, media ,toot):
+        id=toot.id
         status= Self.api.status_post(text,in_reply_to_id=id, media_ids=[media.media_id])
         return status
 
     def reply(Self, toot, text):
-
         msg=" "
         for line in text.split("\n"):
             if "ERROR"  in line or "error:" in line:
