@@ -10,6 +10,8 @@ assets/MSBASIC.bin
 assets/action.atr
 assets/PILOTII.atr
 assets/ATARIXL.ROM
+assets/atari800*
+
 .venv
 
 # Byte-compiled / optimized / DLL files
@@ -18,3 +20,4 @@ __pycache__/
 *$py.class
 
 .DS_Store
+working

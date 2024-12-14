@@ -5,7 +5,6 @@ RUN apt install -yq peg gawk
 WORKDIR /root
 RUN wget -q --no-check-certificate  https://sourceforge.net/projects/atari8/files/franny/Franny-1.1.3/franny-1.1.3.tgz/download -O franny.tgz && tar -xzvf franny.tgz
 RUN cd franny-1.1.3 && make franny
-RUN ls -la /root/franny-1.1.3/
 
 RUN wget -q --no-check-certificate https://github.com/dmsc/tbxl-parser/archive/refs/tags/v10.tar.gz -O tbxl-parser-10.tar.gz && tar -zxf tbxl-parser-10.tar.gz && cd tbxl-parser-10 && make CROSS= EXT= CFLAGS='-Wall -O2 -flto -DNDEBUG'
 
@@ -26,9 +25,9 @@ RUN mkdir -p /home/atari8/bot/working && chown -R atari /home/atari8/
 RUN mkdir -p /usr/local/franny/bin/
 
 COPY --chown=atari . /home/atari8/bot/
-COPY --from=builder --chmod=755 /root/franny-1.1.3/franny /usr/local/franny/bin/
+COPY --from=builder --chmod=755 /root/franny-1.1.3/franny /usr/local/bin/
 COPY --from=builder --chmod=755 /root/tbxl-parser-10/build/basicParser /usr/local/bin/
-COPY --from=builder --chmod=755 /usr/local/bin/atari800 /home/atari8/bot/assets/
+COPY --from=builder --chmod=755 /root/atari800/src/atari800 /home/atari8/bot/assets/
 
 WORKDIR /home/atari8/bot
 RUN pip3 install -r requirements.txt
